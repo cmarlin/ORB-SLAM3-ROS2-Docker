@@ -101,10 +101,10 @@ export XDG_RUNTIME_DIR=/tmp/runtime-root
 alias ranger='ranger --choosedir=/root/.rangerdir; LASTDIR=`cat /root/.rangerdir`; cd $LASTDIR'
 alias cdros='cd /root/colcon_ws/'
 alias sws='source /root/colcon_ws/install/setup.bash'
-alias sros='source /opt/ros/humble/setup.bash'
+alias sros='source /opt/ros/${ROS_DISTRO}/setup.bash'
 alias vsc='code --no-sandbox --disable-gpu-sandbox --user-data-dir=/tmp/vscode .'
 alias sep='echo "================================================================="'
-source /opt/ros/humble/setup.bash
+source /opt/ros/${ROS_DISTRO}/setup.bash
 export RCUTILS_COLORIZED_OUTPUT=1
 cd
 sros

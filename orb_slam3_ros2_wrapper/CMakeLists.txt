@@ -13,7 +13,7 @@ MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
 
 # You should set the PYTHONPATH to your own python site-packages path
-set(ENV{PYTHONPATH} "/opt/ros/humble/lib/python3.10/site-packages/")
+set(ENV{PYTHONPATH} "/opt/ros/${ROS_DISTRO}/lib/python3.10/site-packages/")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
