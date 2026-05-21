@@ -45,11 +45,6 @@ RUN apt-get install -y libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
 RUN apt-get install -y libgtk-3-dev
 RUN apt-get install -y libopencv-dev
 
-RUN if [ "$TARGETARCH" = "arm64" ] || [ "$TARGETARCH" = "arm" ]; then \
-    apt-get install -y libcamera-tools libcamera-ipa; \
-    fi \
-    && rm -rf /var/lib/apt/lists/*
-
 # Build vscode (can be removed later for deployment)
 COPY ./container_root/shell_scripts/vscode_install.sh /root/
 RUN cd /root/ && sudo chmod +x * && ./vscode_install.sh && rm -rf vscode_install.sh
@@ -130,8 +125,6 @@ RUN if [ "$USE_CI" = "true" ]; then \
     fi
 
 RUN rm -rf /home/orb/ORB_SLAM3 /root/colcon_ws
-
-&& rm -rf /var/lib/apt/lists/*
 
 # ===============================================================================
 # Final stage (Either CPU or NVIDIA GPU based on `--target` flag)
