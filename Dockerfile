@@ -41,13 +41,7 @@ RUN apt-get install -y python3-dev python3-numpy python2-dev
 RUN apt-get install -y libavcodec-dev libavformat-dev libswscale-dev
 RUN apt-get install -y libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
 RUN apt-get install -y libgtk-3-dev
-
-RUN cd /tmp && git clone https://github.com/opencv/opencv.git && \
-    cd opencv && \
-    git checkout 4.4.0 && mkdir build && cd build && \
-    cmake -D CMAKE_BUILD_TYPE=Release -D BUILD_EXAMPLES=OFF  -D BUILD_DOCS=OFF -D BUILD_PERF_TESTS=OFF -D BUILD_TESTS=OFF -D CMAKE_INSTALL_PREFIX=/usr/local .. && \
-    make -j8 && make install && \
-    cd / && rm -rf /tmp/opencv
+RUN apt-get install -y libopencv-dev
 
 # Build vscode (can be removed later for deployment)
 COPY ./container_root/shell_scripts/vscode_install.sh /root/
@@ -56,7 +50,7 @@ RUN cd /root/ && sudo chmod +x * && ./vscode_install.sh && rm -rf vscode_install
 RUN apt-get update && apt-get install ros-humble-pcl-ros tmux -y
 RUN apt-get install ros-humble-nav2-common x11-apps nano -y
 RUN apt-get install -y gdb gdbserver ros-humble-rmw-cyclonedds-cpp ros-humble-cv-bridge ros-humble-image-transport ros-humble-image-common ros-humble-vision-opencv
-
+RUN apt-get update && apt-get install -y ros-humble-pangolin ros-humble-topic-tools ros-humble-v4l2-camera ros-humble-camera-ros ros-humble-camera-calibration ros-humble-rviz2 && rm -rf /var/lib/apt/lists/*
 
 # ===============================================================================
 # NVIDIA GPU image stage (built if `--target nvidia_gpu` is specified)
@@ -116,14 +110,6 @@ RUN rm -rf /home/orb/ORB_SLAM3 /root/colcon_ws
 # ===============================================================================
 
 FROM base AS cpu
-
-# Build Pangolin
-RUN cd /tmp && git clone https://github.com/stevenlovegrove/Pangolin && \
-    cd Pangolin && git checkout v0.9.1 && mkdir build && cd build && \
-    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS=-std=c++14 -DCMAKE_INSTALL_PREFIX=/usr/local .. && \
-    make -j8 && \
-    make install && \
-    cd / && rm -rf /tmp/Pangolin && ldconfig
 
 COPY ORB_SLAM3 /home/orb/ORB_SLAM3
 COPY orb_slam3_ros2_wrapper /root/colcon_ws/src/orb_slam3_ros2_wrapper
