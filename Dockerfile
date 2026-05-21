@@ -3,12 +3,14 @@
 # Default to cpu build. Cuda kernels are built only if `--target nvidia` is specified.
 # ===============================================================================
 ARG TARGET=cpu
+ARG TARGETARCH
 
 # ===============================================================================
 # Base stage (Common dependencies for CPU and NVIDIA GPU builds)
 # ===============================================================================
 FROM ros:humble-ros-base-jammy AS base
 ARG USE_CI
+ARG TARGETARCH
 
 RUN apt-get update
 
@@ -42,7 +44,11 @@ RUN apt-get install -y libavcodec-dev libavformat-dev libswscale-dev
 RUN apt-get install -y libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
 RUN apt-get install -y libgtk-3-dev
 RUN apt-get install -y libopencv-dev
-RUN apt-get install -y libcamera-tools libcamera-ipa
+
+RUN if [ "$TARGETARCH" = "arm64" ] || [ "$TARGETARCH" = "arm" ]; then \
+    apt-get install -y libcamera-tools libcamera-ipa; \
+    fi \
+    && rm -rf /var/lib/apt/lists/*
 
 # Build vscode (can be removed later for deployment)
 COPY ./container_root/shell_scripts/vscode_install.sh /root/
@@ -51,7 +57,7 @@ RUN cd /root/ && sudo chmod +x * && ./vscode_install.sh && rm -rf vscode_install
 RUN apt-get update && apt-get install ros-humble-pcl-ros tmux -y
 RUN apt-get install ros-humble-nav2-common x11-apps nano -y
 RUN apt-get install -y gdb gdbserver ros-humble-rmw-cyclonedds-cpp ros-humble-cv-bridge ros-humble-image-transport ros-humble-image-common ros-humble-vision-opencv
-RUN apt-get update && apt-get install -y ros-humble-pangolin ros-humble-topic-tools ros-humble-v4l2-camera ros-humble-camera-ros ros-humble-camera-calibration ros-humble-rviz2
+RUN apt-get update && apt-get install -y ros-humble-pangolin ros-humble-topic-tools ros-humble-v4l2-camera ros-humble-camera-ros ros-humble-camera-calibration ros-humble-rviz2 && rm -rf /var/lib/apt/lists/*
 
 # ===============================================================================
 # NVIDIA GPU image stage (built if `--target nvidia_gpu` is specified)
@@ -124,6 +130,8 @@ RUN if [ "$USE_CI" = "true" ]; then \
     fi
 
 RUN rm -rf /home/orb/ORB_SLAM3 /root/colcon_ws
+
+&& rm -rf /var/lib/apt/lists/*
 
 # ===============================================================================
 # Final stage (Either CPU or NVIDIA GPU based on `--target` flag)
